@@ -1,5 +1,9 @@
 # Mock server for e-commerce project
 
+Base URL for deployed version 
+https://e-commerce-backend-example.herokuapp.com/
+
+
 ## GET ITEMS
  /items
 
