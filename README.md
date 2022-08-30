@@ -7,7 +7,7 @@
  /companies
 
   ### For filtering the response according to name
-  /items?name=<parameter>
+  /items?name=<name_filter>
 
   ### Sorting
   /items?_sort=<parameter>&_order=<ordering_type>
