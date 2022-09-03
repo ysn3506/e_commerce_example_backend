@@ -19,10 +19,12 @@ router.render = (req, res) => {
     return uniqeTags.sort((a, b) => (a.tag > b.tag ? 1 : -1)); //sort according to tag names
   };
 
-  let allCompanies,
-    allTags = [];
+  let allCompanies, allTags = [];
+  
   let productAmountForCompanyFilter, productAmountForTagFilter;
-  const page = Number(req.query.page) || 0;
+
+  const page = Number(req.headers.page) || 0; //Number of page to show products
+
 
   if (req.path === "/items") {
     allCompanies = data.companies.map((company) => {
@@ -44,7 +46,7 @@ router.render = (req, res) => {
     });
 
 
-    
+
     // FOR NEXT TWO VARIABLE ASSIGN:
     // IF USER SELECTS ONE ITEM FOR ANY FILTER, QUERY PROPERTIES COME AS A STRING.OTHERWISE QUERY PROPERTIES COME AS ARRAY.
 
@@ -81,7 +83,7 @@ router.render = (req, res) => {
     tags: allTags, //tags with product amounts according to given filter
     companies: allCompanies, //companies with product amounts according to given filter
     totalItemAmount: res.locals.data.length, // Total product amount for page numbers
-    data: res.locals.data.slice(req.query.page * 16, page * 16 + 16), // Products to show per page.
+    data: res.locals.data.slice(page * 16, page * 16 + 16), // Products to show per page.
     // These two variables show the total product amount for selection of "All" from filter.
     productsAmountsForCompanies: productAmountForCompanyFilter,
     productsAmountsForTags: productAmountForTagFilter,
