@@ -53,11 +53,11 @@ router.render = (req, res) => {
     productAmountForCompanyFilter = data.items.filter(
       (item) =>
         item.tags.some((r) => {
-          if (req.query?.tags) {
-            if (Array.isArray(req.query?.tags)) {
-              return req.query?.tags.includes(r);
+          if (req.query?.tags_like) {
+            if (Array.isArray(req.query?.tags_like)) {
+              return req.query?.tags_like.includes(r);
             } else {
-              return req.query.tags === r;
+              return req.query.tags_like === r;
             }
           } 
             return true;
@@ -70,24 +70,22 @@ router.render = (req, res) => {
         item.itemType === req.query.itemType &&
         (() => {
           if (req.query.manufacturer) {
-               if (Array.isArray(req.query.manufacturer)) {
-                 //
-                 return req.query?.manufacturer.includes(item.manufacturer);
-               } else {
-                 return req.query?.manufacturer === item.manufacturer;
-               }
+            if (Array.isArray(req.query.manufacturer)) {
+              //
+              return req.query?.manufacturer.includes(item.manufacturer);
+            } else {
+              return req.query?.manufacturer === item.manufacturer;
+            }
           }
           return true
-       
-        })
-    ).length;
+        })()).length;
   }
 
   res.jsonp({
     tags: allTags, //tags with product amounts according to given filter
     companies: allCompanies, //companies with product amounts according to given filter
     totalItemAmount: res.locals.data.length, // Total product amount for page numbers
-    data: res.locals.data.slice(page * 16, page * 16 + 16), // Products to show per page.
+    data: res.locals.data?.slice(page * 16, page * 16 + 16), // Products to show per page.
     // These two variables show the total product amount for selection of "All" from filter.
     productsAmountsForCompanies: productAmountForCompanyFilter,
     productsAmountsForTags: productAmountForTagFilter,
@@ -97,5 +95,5 @@ router.render = (req, res) => {
 server.use(router);
 
 server.listen(process.env.PORT || 3000, () => {
-  console.log("JSON Server is running");
+  console.log(`JSON Server is running on port ${process.env.PORT}`);
 });
