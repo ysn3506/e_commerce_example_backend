@@ -25,12 +25,39 @@ router.render = (req, res) => {
 
   const page = Number(req.headers.page) || 0; //Number of page to show products
 
+  const isTagIncluded = (item) =>
+    item.tags.some((r) => {
+      if (req.query?.tags_like) {
+        if (Array.isArray(req.query?.tags_like)) {
+          return req.query?.tags_like.includes(r);
+        } else {
+          return req.query.tags_like === r;
+        }
+      }
+      return true;
+    }) && item.itemType === req.query.itemType;
+  
+  const isCompanyIncluded = (item) =>
+    item.itemType === req.query.itemType &&
+    (() => {
+      if (req.query.manufacturer) {
+        if (Array.isArray(req.query.manufacturer)) {
+          //
+          return req.query?.manufacturer.includes(item.manufacturer);
+        } else {
+          return req.query?.manufacturer === item.manufacturer;
+        }
+      }
+      return true;
+    })();
+
+
 
   if (req.path === "/items") {
     allCompanies = data.companies.map((company) => {
       //company list with product amounts according to given filter
       let amount = 0;
-      res.locals.data.forEach((element) => {
+      data.items.filter(isTagIncluded).forEach((element) => {
         if (element.manufacturer === company.slug) amount += 1;
       });
       return { ...company, amount: amount };
@@ -39,9 +66,9 @@ router.render = (req, res) => {
     allTags = tags().map((tag) => {
       //tag list  product amounts according to given filter
       let amount = 0;
-      res.locals.data.forEach((element) => {
-        if (element.tags.includes(tag)) amount += 1;
-      });
+       data.items.filter(isCompanyIncluded).forEach((element) => {
+         if (element.tags.includes(tag)) amount += 1;
+       });
       return { tagName: tag, amount: amount };
     });
 
@@ -51,34 +78,11 @@ router.render = (req, res) => {
     // IF USER SELECTS ONE ITEM FOR ANY FILTER, QUERY PROPERTIES COME AS A STRING.OTHERWISE QUERY PROPERTIES COME AS ARRAY.
 
     productAmountForCompanyFilter = data.items.filter(
-      (item) =>
-        item.tags.some((r) => {
-          if (req.query?.tags_like) {
-            if (Array.isArray(req.query?.tags_like)) {
-              return req.query?.tags_like.includes(r);
-            } else {
-              return req.query.tags_like === r;
-            }
-          } 
-            return true;
-          
-        }) && item.itemType === req.query.itemType
+    isTagIncluded
     ).length;
 
     productAmountForTagFilter = data.items.filter(
-      (item) =>
-        item.itemType === req.query.itemType &&
-        (() => {
-          if (req.query.manufacturer) {
-            if (Array.isArray(req.query.manufacturer)) {
-              //
-              return req.query?.manufacturer.includes(item.manufacturer);
-            } else {
-              return req.query?.manufacturer === item.manufacturer;
-            }
-          }
-          return true
-        })()).length;
+     isCompanyIncluded).length;
   }
 
   res.jsonp({
