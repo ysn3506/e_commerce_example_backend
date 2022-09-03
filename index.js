@@ -59,9 +59,9 @@ router.render = (req, res) => {
             } else {
               return req.query.tags === r;
             }
-          } else {
+          } 
             return true;
-          }
+          
         }) && item.itemType === req.query.itemType
     ).length;
 
@@ -69,12 +69,16 @@ router.render = (req, res) => {
       (item) =>
         item.itemType === req.query.itemType &&
         (() => {
-          if (Array.isArray(req.query.manufacturer)) {
-            //
-            return req.query?.manufacturer.includes(item.manufacturer);
-          } else {
-            return req.query?.manufacturer === item.manufacturer;
+          if (req.query.manufacturer) {
+               if (Array.isArray(req.query.manufacturer)) {
+                 //
+                 return req.query?.manufacturer.includes(item.manufacturer);
+               } else {
+                 return req.query?.manufacturer === item.manufacturer;
+               }
           }
+          return true
+       
         })
     ).length;
   }
